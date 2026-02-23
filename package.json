@@ -5,14 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
+    "test:headed": "playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:debug": "npx playwright test --debug",
-    "test:chrome": "npx playwright test --project=chromium",
-    "test:mobile": "npx playwright test --project=mobile-chrome",
     "lint": "eslint src tests --ext .ts",
     "format": "prettier --write src tests",
-    "allure:generate": "allure generate ./allure-results --clean",
-    "allure:open": "allure open ./allure-report"
+    "allure:open": "allure open allure-report",
+    "allure:generate": "allure generate allure-results -o allure-report --clean"
   },
   "keywords": [],
   "author": "",
