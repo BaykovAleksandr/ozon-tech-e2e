@@ -11,39 +11,48 @@ test.describe('Навигация по ERP разделу', () => {
   });
 
   test('Переход через "О нас" -> ERP -> Вакансии в новой вкладке', async ({ page, context }) => {
-    // Открыть подменю "О нас"
-    await homePage.openAboutMenu();
+    test.info().annotations.push({ type: 'epic', description: 'ERP' });
+    test.info().annotations.push({ type: 'feature', description: 'Навигация по сайту' });
+    test.info().annotations.push({
+      type: 'story',
+      description: 'Переход на страницу вакансий ERP через подменю "О нас"',
+    });
+    test.info().annotations.push({ type: 'severity', description: 'critical' });
+    test.info().annotations.push({ type: 'tag', description: 'smoke' });
 
-    // Кликнуть по пункту "Ozon ERP"
-    const erpMenuItem = page.locator('button:has-text("Ozon ERP")').first();
-    await expect(erpMenuItem).toBeVisible({ timeout: 5000 });
-    await erpMenuItem.click();
+    await test.step('Открыть подменю "О нас"', async () => {
+      await homePage.openAboutMenu();
+    });
 
-    // Проверить, что мы на странице ERP
-    await page.waitForURL(/.*erp.*/);
-    await expect(page.locator('h1:has-text("ERP")')).toBeVisible();
+    await test.step('Кликнуть по пункту "Ozon ERP"', async () => {
+      const erpMenuItem = page.locator('button:has-text("Ozon ERP")').first();
+      await expect(erpMenuItem).toBeVisible({ timeout: 5000 });
+      await erpMenuItem.click();
+    });
 
-    // Найти кнопку "Вакансии" на странице ERP
-    const vacanciesButton = page
-      .locator('a[href*="/vacancies/?teams=ERP+и+учётные+системы"]')
-      .first();
+    await test.step('Проверить загрузку страницы ERP', async () => {
+      await page.waitForURL(/.*erp.*/);
+      await expect(page.locator('h1:has-text("ERP")')).toBeVisible();
+    });
 
-    // Кликаем и ожидаем новую вкладку
-    const [newPage] = await Promise.all([context.waitForEvent('page'), vacanciesButton.click()]);
+    await test.step('Кликнуть по кнопке "Вакансии" и перехватить новую вкладку', async () => {
+      const vacanciesButton = page
+        .locator('a[href*="/vacancies/?teams=ERP+и+учётные+системы"]')
+        .first();
 
-    // Ждём загрузки новой вкладки
-    await newPage.waitForLoadState();
+      const [newPage] = await Promise.all([context.waitForEvent('page'), vacanciesButton.click()]);
 
-    // Проверяем, что URL новой вкладки содержит параметры фильтра ERP
-    expect(newPage.url()).toContain('/vacancies/?teams=ERP');
+      await newPage.waitForLoadState();
+      expect(newPage.url()).toContain('/vacancies/?teams=ERP');
+      await expect(newPage).toHaveTitle(/Вакансии/);
 
-    // Дополнительно можно проверить заголовок страницы вакансий
-    await expect(newPage).toHaveTitle(/Вакансии/);
+      await test.step('Закрыть новую вкладку', async () => {
+        await newPage.close();
+      });
+    });
 
-    // Закрываем новую вкладку (опционально)
-    await newPage.close();
-
-    // Убедимся, что исходная вкладка осталась на странице ERP
-    await expect(page).toHaveURL(/.*erp.*/);
+    await test.step('Проверить, что исходная вкладка осталась на странице ERP', async () => {
+      await expect(page).toHaveURL(/.*erp.*/);
+    });
   });
 });
