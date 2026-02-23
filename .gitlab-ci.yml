@@ -28,8 +28,11 @@ test:
 
 allure-report:
   stage: report
-  image: frankescobar/allure-docker-service
+  image: node:20
+  dependencies:
+    - test
   script:
+    - npm install -g allure-commandline
     - allure generate allure-results -o allure-report --clean
   artifacts:
     when: always
