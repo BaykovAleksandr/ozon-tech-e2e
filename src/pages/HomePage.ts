@@ -14,7 +14,6 @@ export class HomePage extends BasePage {
     return this.page.locator('._contentButton_1q8y1_47');
   }
 
-  // Вкладки в хедере по data-testid
   get eventsTab(): Locator {
     return this.page.locator('a[data-testid="menuItem"][href="/events/"]').first();
   }
@@ -35,11 +34,10 @@ export class HomePage extends BasePage {
     return this.page.locator('a[data-testid="menuItem"][href="/career/"]').first();
   }
 
-  get aboutTab(): Locator {
-    return this.page.locator('a[data-testid="menuItem"][href="/about/"]').first();
+  get aboutMenuButton(): Locator {
+    return this.page.locator('button:has-text("О нас")').first();
   }
 
-  // Социальные ссылки в футере
   get socialLinks(): Locator {
     return this.footer.locator('._networksWrapper_8h9kr_34 a');
   }
@@ -62,6 +60,11 @@ export class HomePage extends BasePage {
 
   get habrLink(): Locator {
     return this.footer.locator('a[href*="habr.com"]').first();
+  }
+
+  async openAboutMenu() {
+    await this.aboutMenuButton.click();
+    await this.page.waitForSelector('button:has-text("Ozon ERP")', { timeout: 5000 });
   }
 
   async waitForSocialLinks() {
@@ -90,11 +93,6 @@ export class HomePage extends BasePage {
 
   async goToCareer() {
     await this.careerTab.click();
-    await this.waitForNavigation();
-  }
-
-  async goToAbout() {
-    await this.aboutTab.click();
     await this.waitForNavigation();
   }
 
